@@ -1,0 +1,11 @@
+(ex1
+ (trivial 0
+  (quit "quit" 3651245375 ("" (expand "f") (("" (propax) nil nil)) nil)
+        ((f const-decl "real" ex1 nil)) shostak)
+  (trivial-1 nil 3651245044 ("" (grind) nil nil)
+   ((f const-decl "real" ex1 nil)) shostak))
+ (another 0
+  (another-1 nil 3651326989
+   ("" (skosimp*) (("" (expand "f") (("" (propax) nil nil)) nil)) nil)
+   ((f const-decl "real" ex1 nil)) shostak)))
+

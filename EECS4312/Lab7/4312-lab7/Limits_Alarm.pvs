@@ -1,0 +1,94 @@
+Limits_Alarm[delta: posreal]: THEORY
+ BEGIN
+
+  IMPORTING Time[delta]
+
+  IMPORTING Hysteresis[delta]
+
+  % monitored variables
+  H: VAR [DTIME -> real]
+  X: VAR [DTIME -> real]
+  L: VAR [DTIME -> real]
+  EPS: VAR [DTIME -> real]
+
+  % controlled variables
+  QH: VAR [DTIME -> BOOL]
+  Q: VAR [DTIME -> BOOL]
+  QL: VAR [DTIME -> BOOL]
+
+ 
+  r1, r2, r3: VAR [DTIME -> real]
+  nzr: VAR [DTIME -> {r: real | r /= 0}]
+  b1, b2, b3: VAR [DTIME -> BOOL]
+  minus(r1, r2, r3): bool = FORALL (i: DTIME): r3(i) = r1(i) - r2(i)
+  plus(r1, r2, r3): bool = FORALL (i: DTIME): r3(i) = r1(i) + r2(i)
+  divide(r1, nzr, r3): bool = FORALL (i: DTIME): r3(i) = r1(i) / nzr(i)
+  gte_one(b1, b2, b3): bool =
+      FORALL (i: DTIME): b3(i) = IF b1(i) + b2(i) >= 1 THEN 1 ELSE 0 ENDIF
+
+
+  limits_alarm_fbd(H, X, L, EPS, QH, Q, QL): bool =
+      EXISTS (w1, w2, w3: [DTIME -> real]):
+        divide(EPS, (LAMBDA (i: DTIME): 2.0), w1) 
+	AND minus(H, w1, w2) 
+	AND plus(L, w1, w3) 
+	AND hysteresis_req(X, w2, w1, QH) 
+	AND hysteresis_req(w3, X, w1, QL) 
+	AND gte_one(QH, QL, Q)
+  
+
+  env_1(H, X, L, EPS): bool = FORALL (i: DTIME): EPS(i) > 0
+  
+  env_2(H, X, L, EPS): bool = FORALL (i: DTIME): H(i)-EPS(i) > L(i) + EPS(i)
+
+
+  high_alarm_req (H, X, L, EPS, QH): bool =
+     env_1 (H, X, L, EPS)
+     IMPLIES 
+     FORALL (i: DTIME):
+        COND
+	i = 0 -> QH(0) = 0,
+	i > 0 ->
+	 COND
+	 %==================================================
+	    X(i) > H(i) -> QH(i) = 1,
+	 %==================================================
+	    ((H(i) - EPS(i)) <= X(i)) AND (X(i) <= H(i)) -> QH(i) = QH(i -1),
+	 %==================================================
+	    X(i) < (H(i) - EPS(i)) -> QH(i) = 0
+	 ENDCOND
+	ENDCOND
+ 
+
+  low_alarm_req (H, X, L, EPS, QL): bool =
+    env_1 (H, X, L, EPS)
+    IMPLIES
+     FORALL (i: DTIME):
+        COND
+	i = 0 -> QL(0) = 0,
+	i > 0 ->
+	 COND
+	 %==================================================
+	    X(i) < L(i) -> QL(i) = 1,
+	 %==================================================
+	    (L(i) <= X(i)) AND (X(i) <= (L(i) + EPS(i))) -> QL(i) = QL(i-1),
+	 %==================================================
+	    X(i) > (L(i) + EPS(i)) -> QL(i) = 0
+	 ENDCOND
+       ENDCOND
+
+  limits_alarm_req(H, X, L, EPS, QH, Q, QL): bool =
+      high_alarm_req(H, X, L, EPS, QH) AND low_alarm_req(H, X, L, EPS, QL) AND gte_one(QH, QL, Q)
+
+  correct_limits_alarm_fbd: THEOREM
+    (env_1(H, X, L, EPS) AND env_2(H, X, L, EPS) AND limits_alarm_fbd(H, X, L, EPS, QH, Q, QL))
+    IMPLIES limits_alarm_req(H, X, L, EPS, QH, Q, QL)
+
+  no_simultaneous_alarms(QH, Q, QL): bool =
+      FORALL (i: DTIME): NOT (QH(i) = 1 AND QL(i) = 1)
+
+  req_entails_inv: THEOREM
+      (env_1(H, X, L, EPS) AND env_2(H, X, L, EPS) AND limits_alarm_req(H, X, L, EPS, QH, Q, QL))
+      IMPLIES no_simultaneous_alarms(QH, Q, QL)
+
+ END Limits_Alarm

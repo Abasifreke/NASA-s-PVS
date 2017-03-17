@@ -1,0 +1,15 @@
+ex1: THEORY
+
+BEGIN
+
+x:VAR real
+
+f(x):real = x + 1
+
+trivial: THEOREM (FORALL (x:real):f(x) > x)
+
+a: VAR real
+
+Another: Lemma f(a- f(a)) =  0
+
+END ex1

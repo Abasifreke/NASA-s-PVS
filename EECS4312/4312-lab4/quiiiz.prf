@@ -1,0 +1,17 @@
+(resource
+ (check 0
+  (check-1 nil 3653936725
+   ("" (grind)
+    (("" (expand "add")
+      (("" (expand "member")
+        (("" (expand "remove")
+          (("" (expand "member")
+            (("" (assert) (("" (grind) (("" (postpone) nil nil)) nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   nil shostak)))
+

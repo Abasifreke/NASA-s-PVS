@@ -1,0 +1,15 @@
+(ex1
+ (trivial 0
+  (quit "quit" 3651245375 ("" (expand "f") (("" (propax) nil nil)) nil)
+        ((f const-decl "nat" ex1 nil)) shostak)
+  (trivial-1 nil 3651245044 ("" (grind) nil nil)
+   ((f const-decl "nat" ex1 nil)) shostak))
+ (another_TCC1 0
+  (another_TCC1-1 nil 3651326595 ("" (subtype-tcc) nil nil) nil nil))
+ (another_TCC2 0
+  (another_TCC2-1 nil 3651328032 ("" (subtype-tcc) nil nil) nil nil))
+ (another 0
+  (another-1 nil 3651326989
+   ("" (skosimp*) (("" (expand "f") (("" (propax) nil nil)) nil)) nil)
+   ((f const-decl "nat" ex1 nil)) shostak)))
+

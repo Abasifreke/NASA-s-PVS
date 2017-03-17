@@ -1,0 +1,17 @@
+resource[T: TYPE+]: THEORY
+BEGIN
+	free: VAR set[T]
+	r, e, w: VAR T
+
+allocate(r, free):set[T] = 
+if free(r) then remove(r, free)
+else free endif
+
+deallocate(r, free):set[T] = 
+if NOT free(r) then add(r, free)
+else free endif
+
+check: CONJECTURE
+ free(r) => deallocate(r, allocate(r, free)) = free
+
+END resource
